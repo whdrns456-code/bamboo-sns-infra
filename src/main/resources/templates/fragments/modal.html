@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="systemModal">
+    <div id="systemModal">
+        <div class="terminal-card">
+            <h3 id="modalTitle">[SYSTEM_MSG]</h3>
+            <p id="modalMessage"></p>
+            <div style="text-align: right;">
+                <button type="button" onclick="closeModal()" class="btn-check">ACKNOWLEDGE</button>
+            </div>
+        </div>
+    </div>
+    <style>
+        #systemModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            background: rgb(0, 0, 0) !important;
+            background: rgba(0, 0, 0, 0.99) !important;
+            backdrop-filter: blur(25px) contrast(120%) brightness(40%) !important;
+            -webkit-backdrop-filter: blur(25px) contrast(120%) brightness(40%) !important;
+        }
+        #systemModal .terminal-card {
+            max-width: 500px;
+            width: 90%;
+            background-color: #000000 !important;
+            border: 2px solid var(--primary-green) !important;
+            padding: 40px !important;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 1), 0 0 30px rgba(0, 255, 65, 0.2) !important;
+            position: relative;
+        }
+        #modalTitle {
+            color: #00ff41 !important;
+            font-size: 1.3rem !important;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--dark-green) !important;
+            margin-bottom: 20px !important;
+            padding-bottom: 10px !important;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        #modalMessage {
+            color: #ffffff !important;
+            font-size: 1rem !important;
+            line-height: 1.8 !important;
+            word-break: break-all;
+            text-shadow: 0 0 5px #000;
+        }
+
+        .btn-check {
+            background: transparent !important;
+            border: 1px solid var(--primary-green) !important;
+            color: var(--primary-green) !important;
+            padding: 8px 20px !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-weight: bold !important;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            text-transform: uppercase;
+            margin-top: 20px;
+        }
+
+        .btn-check:hover {
+            background: var(--primary-green) !important;
+            color: #000000 !important;
+            box-shadow: 0 0 15px var(--primary-green);
+        }
+
+        .btn-check:active {
+            transform: scale(0.95);
+        }
+    </style>
+</div>
+</html>

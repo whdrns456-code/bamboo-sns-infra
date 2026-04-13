@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAMBOO_NET | SESSION_INITIALIZATION</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<canvas id="bambooCanvas"></canvas>
+
+<div class="login-container">
+    <div class="terminal-header">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">BAMBOO_SECURE_LOGIN_v2.4</div>
+    </div>
+
+    <div class="login-box">
+        <h1 class="glitch" data-text="LOGIN">LOGIN</h1>
+        <p class="subtitle">ENTER_CREDENTIALS_TO_ACCESS_THE_FOREST</p>
+
+        <form id="loginForm" onsubmit="initiateLogin(event);">
+            <div class="input-group">
+                <label for="username">USER_IDENTIFIER</label>
+                <input type="text" id="username" name="username" required placeholder="Enter ID..." autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label for="password">ACCESS_KEY</label>
+                <input type="password" id="password" name="password" required placeholder="Enter Password...">
+            </div>
+
+            <button type="submit" class="btn-login">INITIATE_SESSION</button>
+        </form>
+
+        <div class="footer-info">
+            <div class="status-blink"></div>
+            <span>ENCRYPTION_ACTIVE | <a href="/signup" style="color: var(--primary-green); text-decoration: none; margin-left: 5px;">_REGISTER_NEW_IDENTITY</a></span>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/modal :: systemModal}"></div>
+<script src="/js/main.js"></script>
+
+<script>
+    async function initiateLogin(e) {
+        if (e) e.preventDefault();
+
+        const loginForm = document.querySelector('#loginForm');
+
+        const params = new URLSearchParams(new FormData(loginForm));
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                body: params,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            if (response.ok) {
+
+                window.location.href = await response.text();
+            } else {
+                showSystemMessage('ACCESS_DENIED: INVALID_CREDENTIALS', true);
+            }
+        } catch (error) {
+            showSystemMessage('NETWORK_ERROR: INFRA_UNREACHABLE', true);
+        }
+    }
+</script>
+</body>
+</html>

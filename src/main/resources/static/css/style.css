@@ -1,0 +1,215 @@
+:root {
+    --bg-color: #0a0e17;
+    --primary-green: #00ff41;
+    --soft-green: #00e676;
+    --dark-green: #003b11;
+    --error-red: #ff3e3e;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--primary-green);
+    font-family: var(--font-mono);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+/* Canvas Background */
+#bambooCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    opacity: 0.4;
+    display: block;
+}
+
+/* Login Container */
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    background: rgba(10, 14, 23, 0.85);
+    border: 1px solid var(--primary-green);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    position: relative;
+    backdrop-filter: blur(5px);
+}
+
+/* Terminal Header */
+.terminal-header {
+    background: var(--dark-green);
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--primary-green);
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+.title {
+    font-size: 10px;
+    color: var(--primary-green);
+    margin-left: 10px;
+    letter-spacing: 1px;
+}
+
+/* Login Box */
+.login-box {
+    padding: 40px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 5px;
+    letter-spacing: 4px;
+    position: relative;
+}
+
+.subtitle {
+    font-size: 0.7rem;
+    text-align: center;
+    margin-bottom: 40px;
+    opacity: 0.7;
+    letter-spacing: 2px;
+}
+
+/* Form Styling */
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.input-group input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--dark-green);
+    padding: 12px 15px;
+    color: var(--primary-green);
+    font-family: var(--font-mono);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+.input-group input::placeholder {
+    color: var(--dark-green);
+}
+
+/* Button Styling */
+.btn-login {
+    width: 100%;
+    background: var(--primary-green);
+    color: var(--bg-color);
+    border: none;
+    padding: 15px;
+    font-family: var(--font-mono);
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    letter-spacing: 2px;
+}
+
+.btn-login:hover {
+    background: var(--soft-green);
+    box-shadow: 0 0 20px var(--primary-green);
+}
+
+/* Footer */
+.footer-info {
+    margin-top: 30px;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+}
+
+.status-blink {
+    width: 6px;
+    height: 6px;
+    background: var(--primary-green);
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Glitch Effect */
+.glitch {
+    position: relative;
+}
+
+.glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff00c1;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+    animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% { clip: rect(31px, 9999px, 94px, 0); }
+    20% { clip: rect(62px, 9999px, 42px, 0); }
+    /* ... more frames ... */
+    100% { clip: rect(89px, 9999px, 10px, 0); }
+}
+
+@keyframes glitch-anim2 {
+    0% { clip: rect(10px, 9999px, 20px, 0); }
+    100% { clip: rect(80px, 9999px, 90px, 0); }
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<header th:fragment="header" class="terminal-nav">
+    <div class="nav-container">
+        <div class="logo">
+            <a href="/main" class="glitch-text" data-text="BAMBOO_NET">BAMBOO_NET</a>
+        </div>
+
+        <!-- Mobile Toggle Button -->
+        <button class="mobile-toggle" id="mobileToggle">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+
+        <nav class="nav-links" id="navLinks">
+            <a href="/main" class="nav-item">/HOME</a>
+
+            <div sec:authorize="isAuthenticated()" class="auth-group">
+                <a href="/write" class="nav-item">/WRITE</a>
+                <a href="/mypage" class="nav-item">/MY_PAGE</a>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit" class="nav-item logout-btn">/LOGOUT</button>
+                </form>
+            </div>
+
+            <!-- Anonymous Links -->
+            <div sec:authorize="isAnonymous()" class="auth-group">
+                <a href="/login" class="nav-item">/LOGIN</a>
+            </div>
+        </nav>
+    </div>
+    <div class="nav-scanline"></div>
+</header>
+</body>
+</html>

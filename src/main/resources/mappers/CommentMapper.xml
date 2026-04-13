@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.bambooforest.mapper.CommentMapper">
+
+    <insert id="saveComment" parameterType="com.example.bambooforest.model.Comment">
+        INSERT INTO comments (
+            post_no,
+            user_no,
+            parent_comment_no,
+            content,
+            created_at,
+            status
+        ) VALUES (
+                     #{postNo},
+                     (SELECT user_no FROM users WHERE username = #{writerUsername}),
+                     #{parentCommentNo},
+                     #{content},
+                     NOW(),
+                     'Y'
+                 )
+    </insert>
+
+    <select id="findCommentsByPostNo" resultType="com.example.bambooforest.model.Comment">
+        SELECT
+        c.*,
+        u.nickname AS writerNickname,
+        u.username AS writerUsername,
+        (SELECT COUNT(*) FROM comment_likes WHERE comment_no = c.comment_no) AS likeCount,
+        <choose>
+            <when test="loginUsername != null">
+                (SELECT COUNT(*) FROM comment_likes
+                WHERE comment_no = c.comment_no
+                AND user_no = (SELECT user_no FROM users WHERE username = #{loginUsername})) AS isLiked
+            </when>
+            <otherwise>
+                0 AS isLiked
+            </otherwise>
+        </choose>
+        FROM comments c
+        JOIN users u ON c.user_no = u.user_no
+        WHERE c.post_no = #{postNo} AND c.status = 'Y'
+        ORDER BY
+        IFNULL(c.parent_comment_no, c.comment_no) ASC,
+        c.comment_no ASC
+    </select>
+
+    <update id="deleteComment">
+        UPDATE comments SET status = 'N' WHERE comment_no = #{commentNo}
+    </update>
+
+
+    <select id="checkCommentLikeExists" resultType="int">
+        SELECT COUNT(*) FROM comment_likes
+        WHERE comment_no = #{commentNo} AND user_no = (SELECT user_no FROM users WHERE username = #{username})
+    </select>
+
+    <insert id="insertCommentLike">
+        INSERT INTO comment_likes (comment_no, user_no)
+        VALUES (#{commentNo}, (SELECT user_no FROM users WHERE username = #{username}))
+    </insert>
+
+    <delete id="deleteCommentLike">
+        DELETE FROM comment_likes
+        WHERE comment_no = #{commentNo} AND user_no = (SELECT user_no FROM users WHERE username = #{username})
+    </delete>
+
+    <select id="countCommentLikes" resultType="int">
+        SELECT COUNT(*) FROM comment_likes WHERE comment_no = #{commentNo}
+    </select>
+
+</mapper>

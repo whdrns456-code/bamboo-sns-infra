@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAMBOO_ROOT | MAIN_DASHBOARD</title>
+    <link rel="stylesheet" href="/css/theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Bamboo Matrix Background -->
+<canvas id="bambooCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.2; pointer-events: none;"></canvas>
+
+<!-- Thymeleaf Fragment: Header -->
+<div th:replace="~{fragments/header :: header}">
+    <header class="terminal-nav">
+        <div class="nav-container">
+            <div class="logo"><a href="/" class="glitch-text" data-text="BAMBOO_NET">BAMBOO_NET</a></div>
+            <div class="mobile-toggle" id="mobileToggle">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </div>
+            <nav class="nav-links" id="navLinks">
+                <a href="/" class="nav-item">/HOME</a>
+                <a href="/board/write" class="nav-item">/WRITE</a>
+                <a href="/signup" class="nav-item">/SIGNUP</a>
+            </nav>
+        </div>
+    </header>
+</div>
+
+<main class="main-content">
+    <div class="welcome-section">
+        <h2 class="glitch-text" data-text="BAMBOO_FOREST_BOARD">BAMBOO_FOREST_BOARD</h2>
+        <p class="terminal-text">ACCESSING ENCRYPTED_DATA_STREAM... [OK]</p>
+    </div>
+
+    <!-- Section 1: Root  -->
+    <div class="announcement-container" style="margin-bottom: 30px;">
+        <div class="terminal-card" style="border-color: var(--soft-green); background: rgba(0, 230, 118, 0.05);">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 10px;">
+                <h3 class="card-title" style="color: var(--soft-green); margin: 0;">ROOT_BROADCAST_SYSTEM</h3>
+
+                <div class="root-pagination-controls" style="display: flex; align-items: center; gap: 15px;">
+                    <span id="rootPrev" class="terminal-text" style="cursor: pointer; font-size: 0.8rem; user-select: none;">&lt; PREV_LOG</span>
+
+                    <span id="rootPageIndicator" class="terminal-text"
+                          th:text="'01/' + ${#numbers.formatInteger((totalRootPages != null && totalRootPages > 0 ? totalRootPages : 1), 2)}"
+                          style="font-size: 0.8rem; color: var(--soft-green); min-width: 45px; text-align: center;">01/01</span>
+
+                    <span id="rootNext" class="terminal-text" style="cursor: pointer; font-size: 0.8rem; user-select: none;">NEXT_LOG &gt;</span>
+                </div>
+            </div>
+
+            <div class="announcement-list" id="rootAnnouncementList" style="min-height: 180px; transition: opacity 0.3s ease;">
+
+                <a th:each="root, iter : ${rootPosts}"
+                   th:href="@{/board/detail/{no}(no=${root.postNo})}"
+                   class="announcement-item"
+                   th:classappend="${iter.last} ? 'no-border' : ''">
+                    <div class="announcement-content-wrapper">
+                    <span class="announcement-tag"
+                          th:classappend="${root.category == 'NOTICE'} ? 'info' : 'critical'"
+                          th:text="'[' + ${root.category} + ']'">[TYPE]</span>
+                        <span class="terminal-text" th:text="${root.title}">SUBJECT_TEXT</span>
+                    </div>
+                    <span class="announcement-date"
+                          th:text="${#temporals.format(root.createdAt, 'yyyy-MM-dd HH:mm')}">DATE_TIME</span>
+                </a>
+
+                <div th:if="${#lists.isEmpty(rootPosts)}" class="announcement-item" style="border: none; justify-content: center;">
+                    <span class="terminal-text">NO_BROADCASTS_AVAILABLE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Section 2: Recent Posts (SNS Card Feed) -->
+    <div class="board-container">
+        <div class="terminal-card">
+            <h3 class="card-title">RECENT_POSTS_FEED</h3>
+
+            <div class="sns-feed" id="postFeed">
+                <a th:each="post : ${posts}" th:href="@{/board/detail/{no}(no=${post.postNo})}" class="sns-card">
+
+                    <div class="card-image-container" th:if="${post.imagePath != null}">
+                        <img th:src="${post.imagePath}" alt="Post Image" class="card-image">
+                    </div>
+
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="card-uid" th:text="'#' + ${post.postNo}">#1024</span>
+                            <span class="card-tag" th:text="'[' + ${post.category} + ']'">[ENCRYPTED]</span>
+                        </div>
+                        <span class="card-title-text" th:text="${post.title}">Title</span>
+
+                        <p class="card-preview" th:text="${#strings.length(post.content) > 100 ? #strings.substring(post.content, 0, 100) + '...' : post.content}">
+                            Preview...
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="card-author" th:text="${post.writerNickname != null ? post.writerNickname : 'anonymous'}">author</span>
+                        <div class="card-stats">
+                           <span class="card-date"
+                                 th:if="${post.createdAt != null}"
+                                 th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2026-04-05 16:50</span>
+                            <span class="card-likes">👍 <span th:text="${post.likeCount}">0</span></span> <span class="card-views">👁️ <span th:text="${post.viewCount}">0</span></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Load More Section -->
+            <div class="load-more-container">
+                <button id="loadMoreBtn" class="load-more-btn">[ACCESS NEXT LOGS]</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Thymeleaf Fragment: Footer -->
+<div th:replace="~{fragments/footer :: footer}">
+    <footer class="terminal-footer">
+        <div class="footer-container">
+            <span>&copy; 2026 BAMBOO_FOREST_NETWORKS</span>
+            <span>SYSTEM_READY</span>
+        </div>
+    </footer>
+</div>
+
+<script src="/js/main.js"></script>
+
+<script th:inline="javascript">
+    /* [RECOVERY_LOG]
+       1. SNS 더보기: /api/board/more?lastPostNo=... (List 반환)
+       2. 루트 공지사항: /root-notices?page=... (Map 반환)
+    */
+
+    // 📍 변수 중복 선언 방지를 위해 'var' 또는 중복되지 않는 이름 사용
+    var isSnsEnd = false;
+    var rootCurrentPage = 0;
+    var rootPageSize = 3;
+    var rootTotalPages = [[${totalRootPages != null ? totalRootPages : 1}]];
+
+    // --- [1] 실시간 더보기 (SNS 무한스크롤) ---
+    async function loadMoreSns() {
+        if (isSnsEnd) return;
+
+        const btn = document.getElementById('loadMoreBtn');
+        const feed = document.getElementById('postFeed');
+        if (!btn || !feed) return;
+
+
+        const lastCard = document.querySelector('#postFeed .sns-card:last-child');
+        const lastPostNo = lastCard ? lastCard.getAttribute('href').split('/').pop() : 0;
+
+        try {
+            // MainController 매핑에 맞춰 lastPostNo 전달
+            const response = await fetch(`/api/board/more?lastPostNo=${lastPostNo}`);
+            const newPosts = await response.json(); // List<Posts>
+
+            if (!newPosts || newPosts.length === 0) {
+                btn.innerText = "[ALL_LOGS_LOADED]";
+                isSnsEnd = true;
+                return;
+            }
+
+            newPosts.forEach(post => {
+                const card = document.createElement('a');
+                card.href = `/board/detail/${post.postNo}`;
+                card.className = 'sns-card';
+
+                const imgHtml = post.imagePath ?
+                    `<div class="card-image-container"><img src="${post.imagePath}" class="card-image"></div>` : '';
+                const formattedDate = post.createdAt ? post.createdAt.replace('T', ' ').substring(0, 16) : '';
+
+                // 📍 종군 님이 원래 쓰시던 백틱(``) 구조 그대로 복구
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="card-uid">#${post.postNo}</span>
+                            <span class="card-tag">[${post.category}]</span>
+                        </div>
+                        <span class="card-title-text">${post.title}</span>
+                        <p class="card-preview">${post.content && post.content.length > 100 ? post.content.substring(0, 100) + '...' : (post.content || '')}</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-author">${post.writerNickname || 'anonymous'}</span>
+                        <div class="card-stats">
+                            <span class="card-date">${formattedDate}</span>
+                            <span class="card-likes">👍 ${post.likeCount || 0}</span>
+                            <span class="card-views">👁️ ${post.viewCount}|| 0}</span>
+                        </div>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        } catch (error) {
+            console.error("SNS_LOAD_ERR:", error);
+        }
+    }
+
+    // --- [2] 루트 공지사항 페이징 ---
+    async function loadRootNotices(page) {
+        if (page < 0 || (rootTotalPages > 0 && page >= rootTotalPages)) return;
+
+        const container = document.getElementById('rootAnnouncementList');
+        const indicator = document.getElementById('rootPageIndicator');
+        if (!container) return;
+
+        container.style.opacity = '0';
+
+        try {
+            // BoardController 매핑에 맞춰 page 전달
+            const response = await fetch(`/root-notices?page=${page}&size=${rootPageSize}`);
+            const data = await response.json(); // Map { posts: [], totalPages: x }
+
+            setTimeout(() => {
+                container.innerHTML = '';
+                data.posts.forEach((post, index) => {
+                    const isLast = (index === data.posts.length - 1);
+                    const date = post.createdAt ? post.createdAt.replace('T', ' ').substring(0, 16) : '';
+
+                    container.insertAdjacentHTML('beforeend', `
+                        <a href="/board/detail/${post.postNo}" class="announcement-item ${isLast ? 'no-border' : ''}">
+                            <div class="announcement-content-wrapper">
+                                <span class="announcement-tag info">[${post.category}]</span>
+                                <span class="terminal-text">${post.title}</span>
+                            </div>
+                            <span class="announcement-date">${date}</span>
+                        </a>
+                    `);
+                });
+
+                rootCurrentPage = page;
+                rootTotalPages = data.totalPages;
+                indicator.innerText = `${String(rootCurrentPage + 1).padStart(2, '0')}/${String(Math.max(1, rootTotalPages)).padStart(2, '0')}`;
+                container.style.opacity = '1';
+            }, 300);
+        } catch (e) {
+            console.error("ROOT_LOAD_ERR:", e);
+        }
+    }
+
+    // --- [3] 이벤트 연결 ---
+    window.addEventListener('DOMContentLoaded', () => {
+        // SNS 버튼
+        const snsBtn = document.getElementById('loadMoreBtn');
+        if (snsBtn) snsBtn.onclick = loadMoreSns;
+
+        // Root 버튼
+        const nBtn = document.getElementById('rootNext');
+        const pBtn = document.getElementById('rootPrev');
+        if (nBtn) nBtn.onclick = () => { if (rootCurrentPage + 1 < rootTotalPages) loadRootNotices(rootCurrentPage + 1); };
+        if (pBtn) pBtn.onclick = () => { if (rootCurrentPage > 0) loadRootNotices(rootCurrentPage - 1); };
+    });
+</script>
+
+</body>
+</html>
