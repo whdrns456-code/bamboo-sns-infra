@@ -23,7 +23,7 @@
         <h1 class="glitch" data-text="LOGIN">LOGIN</h1>
         <p class="subtitle">ENTER_CREDENTIALS_TO_ACCESS_THE_FOREST</p>
 
-        <form id="loginForm" onsubmit="initiateLogin(event);">
+        <form id="loginForm" onsubmit="initiateLogin(event); return false;" method="POST">
             <div class="input-group">
                 <label for="username">USER_IDENTIFIER</label>
                 <input type="text" id="username" name="username" required placeholder="Enter ID..." autocomplete="off">
@@ -48,7 +48,10 @@
 
 <script>
     async function initiateLogin(e) {
-        if (e) e.preventDefault();
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
         const loginForm = document.querySelector('#loginForm');
 
