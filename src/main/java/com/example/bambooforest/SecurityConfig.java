@@ -16,33 +16,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()
-                        .requestMatchers("/", "/login", "/signup" ,"/username", "/nickname").permitAll()
+                        // 1. 정적 리소스 및 기본 페이지 허용
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/login", "/signup", "/username", "/nickname").permitAll()
+
+                        // [추가] 메인 페이지에서 호출하는 비동기 API들도 보안 검사 대상에 포함 (또는 명시적 허용)
+                        // .requestMatchers("/api/board/**", "/root-notices/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
-                // 2. 폼 로그인 설정 (핵심 수정 구간)
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
 
-                        // [수정] JS 핸들러 대신 표준 리다이렉트를 사용합니다.
-                        // WAS가 302 Found 응답을 던져야 WAF가 경로를 https로 정확히 보정해줍니다.
-                        .defaultSuccessUrl("/main", true)
-
-                        // 실패 시에도 깔끔하게 로그인 페이지로 리다이렉트
-                        .failureUrl("/login?error=true")
+                        // [수정] WAF 환경에서는 성공 시 핸들러를 통해 리다이렉트 경로를 확실히 제어하는 게 안전합니다.
+                        .successHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.getWriter().write("/main"); // JS fetch가 이 문자열을 받아 이동하게 함
+                            response.getWriter().flush();
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("LOGIN_FAILED");
+                            response.getWriter().flush();
+                        })
                         .permitAll()
                 )
-                // 3. 로그아웃 설정
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 )
-                // 4. 보안 설정
-                .csrf(csrf -> csrf.disable()); // 테스트 단계에서는 disable 유지
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
