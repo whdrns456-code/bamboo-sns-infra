@@ -40,6 +40,12 @@ dependencies {
 
     // 날짜 객체
     // implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time'
+
+    implementation 'org.springframework.session:spring-session-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Redis 없이 세션 기능만 유지하고 싶을 때
+    // implementation 'org.springframework.session:spring-session-core'
 }
 
 tasks.named('test') {

@@ -33,10 +33,16 @@ public class MainController {
     }
 
     @GetMapping("/mypage")
-    public String mypage() {
+    public String mypage(Authentication authentication) {
+        if (authentication != null) {
+            String username = authentication.getName();
+
+            if ("noblejinmo".equals(username)) {
+                return "nobleMypage";
+            }
+        }
         return "mypage";
     }
-
     // 3. 회원가입 페이지 이동 (localhost:8080/signup)
     @GetMapping("/signup")
     public String signup() {

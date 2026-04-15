@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAMBOO_NET | NOBLE_PROFILE</title>
+    <link rel="stylesheet" href="/css/theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles for Noble Page */
+        :root {
+            --primary-pink: #ff99cc;
+            --soft-pink: #ffccff;
+            --dark-pink: #ffebf2;
+            --bg-pink: #fff5f8;
+            --text-color: #7d5a5a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            background: radial-gradient(circle at center, #fff5f8 0%, #ffe4e1 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .terminal-nav {
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 3px dashed #ffb6c1;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo a {
+            color: #ff69b4;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            color: #ff69b4;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover {
+            color: #ff1493;
+            transform: scale(1.1);
+        }
+
+        .main-content {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .noble-card {
+            border: 5px solid #fff;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.4);
+            border-radius: 40px;
+            padding: 50px;
+            position: relative;
+        }
+
+        .noble-card::after {
+            content: '🎀';
+            position: absolute;
+            top: -35px;
+            right: -25px;
+            font-size: 60px;
+        }
+
+        .noble-card::before {
+            content: '🧸';
+            position: absolute;
+            bottom: -25px;
+            left: -35px;
+            font-size: 70px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            border-bottom: 2px dotted #ffc0cb;
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+        }
+
+        .avatar-container {
+            width: 220px;
+            height: 220px;
+            border: 10px solid #fff;
+            border-radius: 40px;
+            transform: rotate(-3deg);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            flex-grow: 1;
+        }
+
+        .user-nickname {
+            color: #ff69b4;
+            font-size: 3.5rem;
+            margin: 0 0 10px 0;
+            text-shadow: 3px 3px 0px #fff;
+            font-weight: 800;
+        }
+
+        .user-meta {
+            color: #ff99cc;
+            font-weight: bold;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 4px solid #ffe4e1;
+            border-radius: 30px;
+            padding: 20px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffb6c1;
+        }
+
+        .stat-value {
+            color: #ff69b4;
+            font-size: 2.5rem;
+            font-weight: 800;
+            display: block;
+        }
+
+        .stat-label {
+            color: #ffb6c1;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-noble {
+            border-radius: 35px;
+            border: 4px solid #ffb6c1;
+            background: #fff;
+            color: #ff69b4;
+            padding: 12px 35px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 0px #ffb6c1;
+            transition: 0.2s;
+        }
+
+        .btn-noble:hover {
+            background: #ffb6c1;
+            color: white;
+            transform: translateY(3px);
+            box-shadow: 0 2px 0px #ffb6c1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #ffb6c1;
+            font-weight: bold;
+            border-top: 3px dashed #ffc0cb;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="terminal-nav">
+    <div class="nav-container">
+        <div class="logo"><a href="/main">BAMBOO_NET</a></div>
+        <nav class="nav-links">
+            <a href="/main" class="nav-item">HOME</a>
+            <a href="/board/write" class="nav-item">WRITE</a>
+            <a href="/mypage" class="nav-item">MY_PAGE</a>
+        </nav>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="noble-card">
+        <div class="profile-header">
+            <div class="avatar-container">
+                <img src="https://picsum.photos/seed/noble/400/400" alt="Noble Avatar" class="avatar-image" referrerPolicy="no-referrer">
+            </div>
+            <div class="profile-info">
+                <h2 class="user-nickname">noble_정진모</h2>
+                <div class="user-meta">
+                    <span>UID: #7777</span>
+                    <span style="color: #ffd700;">GOLDEN_USB_HOLDER</span>
+                    <span style="color: #ff69b4;">ROYAL_ONLINE</span>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-noble">EDIT_ROOM</button>
+                    <button class="btn-noble" style="border-color: #ffccff; color: #ffccff; box-shadow: 0 5px 0px #ffccff;">처음처럼_한잔</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            <div class="stat-card">
+                <span class="stat-value">777</span>
+                <span class="stat-label">CANDIES</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">77.7k</span>
+                <span class="stat-label">HEARTS</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">777k</span>
+                <span class="stat-label">FRIENDS</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px; text-align: center;">
+            <h3 style="color: #ff69b4; font-size: 1.8rem;">🍖 양념갈비가 맛있는 진모네 룸 🍖</h3>
+            <p style="opacity: 0.8; line-height: 1.6;">
+                어서오세요! 여기는 noble한 정진모의 시크릿 룸입니다.<br>
+                에러와 모기는 출입 금지! 황금 USB에 담긴 달콤한 꿈들만 가득해요.<br>
+                양념갈비에 처음처럼 한잔하며, 오늘도 STAY CUTE 하세요!
+            </p>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div>&copy; 2026 NOBLE_JINMO_ROOM</div>
+    <div style="font-size: 0.8rem; margin-top: 10px;">모기_퇴치_완료</div>
+</footer>
+</body>
+</html>
