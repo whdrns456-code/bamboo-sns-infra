@@ -55,3 +55,14 @@ window.closeModal = function() {
     const modal = document.getElementById('systemModal');
     if (modal) modal.style.display = 'none';
 };
+
+async function secureFetch(url, options = {}) {
+    const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+    options.headers = options.headers || {};
+    if (options.method && options.method.toUpperCase() !== 'GET') {
+        if (token && header) options.headers[header] = token;
+    }
+    return fetch(url, options);
+}

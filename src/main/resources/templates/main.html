@@ -133,12 +133,6 @@
 <script src="/js/main.js"></script>
 
 <script th:inline="javascript">
-    /* [RECOVERY_LOG]
-       1. SNS 더보기: /api/board/more?lastPostNo=... (List 반환)
-       2. 루트 공지사항: /root-notices?page=... (Map 반환)
-    */
-
-    // 📍 변수 중복 선언 방지를 위해 'var' 또는 중복되지 않는 이름 사용
     var isSnsEnd = false;
     var rootCurrentPage = 0;
     var rootPageSize = 3;
@@ -152,14 +146,15 @@
         const feed = document.getElementById('postFeed');
         if (!btn || !feed) return;
 
-
         const lastCard = document.querySelector('#postFeed .sns-card:last-child');
         const lastPostNo = lastCard ? lastCard.getAttribute('href').split('/').pop() : 0;
 
         try {
-            // MainController 매핑에 맞춰 lastPostNo 전달
-            const response = await fetch(`/api/board/more?lastPostNo=${lastPostNo}`);
-            const newPosts = await response.json(); // List<Posts>
+            // [수정] fetch -> secureFetch
+            const response = await secureFetch(`/api/board/more?lastPostNo=${lastPostNo}`, {
+                method: 'GET'
+            });
+            const newPosts = await response.json();
 
             if (!newPosts || newPosts.length === 0) {
                 btn.innerText = "[ALL_LOGS_LOADED]";
@@ -176,7 +171,6 @@
                     `<div class="card-image-container"><img src="${post.imagePath}" class="card-image"></div>` : '';
                 const formattedDate = post.createdAt ? post.createdAt.replace('T', ' ').substring(0, 16) : '';
 
-                // 📍 종군 님이 원래 쓰시던 백틱(``) 구조 그대로 복구
                 card.innerHTML = `
                     ${imgHtml}
                     <div class="card-content">
@@ -192,7 +186,7 @@
                         <div class="card-stats">
                             <span class="card-date">${formattedDate}</span>
                             <span class="card-likes">👍 ${post.likeCount || 0}</span>
-                            <span class="card-views">👁️ ${post.viewCount}|| 0}</span>
+                            <span class="card-views">👁️ ${post.viewCount || 0}</span>
                         </div>
                     </div>
                 `;
@@ -214,9 +208,11 @@
         container.style.opacity = '0';
 
         try {
-            // BoardController 매핑에 맞춰 page 전달
-            const response = await fetch(`/root-notices?page=${page}&size=${rootPageSize}`);
-            const data = await response.json(); // Map { posts: [], totalPages: x }
+            // [수정] fetch -> secureFetch
+            const response = await secureFetch(`/root-notices?page=${page}&size=${rootPageSize}`, {
+                method: 'GET'
+            });
+            const data = await response.json();
 
             setTimeout(() => {
                 container.innerHTML = '';
@@ -245,13 +241,10 @@
         }
     }
 
-    // --- [3] 이벤트 연결 ---
     window.addEventListener('DOMContentLoaded', () => {
-        // SNS 버튼
         const snsBtn = document.getElementById('loadMoreBtn');
         if (snsBtn) snsBtn.onclick = loadMoreSns;
 
-        // Root 버튼
         const nBtn = document.getElementById('rootNext');
         const pBtn = document.getElementById('rootPrev');
         if (nBtn) nBtn.onclick = () => { if (rootCurrentPage + 1 < rootTotalPages) loadRootNotices(rootCurrentPage + 1); };

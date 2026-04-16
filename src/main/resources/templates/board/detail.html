@@ -371,7 +371,7 @@
 </div>
 
 <script src="/js/main.js"></script>
-<script th:inline="javascript">
+<!--<script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {
         const postNo = [[${post.postNo}]];
         const likeBtn = document.getElementById('likeBtn');
@@ -435,7 +435,7 @@
         document.addEventListener('click', async (e) => {
             const target = e.target;
 
-            // --- [추가] 댓글 좋아요 버튼 클릭 처리 ---
+            // -&#45;&#45; [추가] 댓글 좋아요 버튼 클릭 처리 -&#45;&#45;
             const commentLikeBtn = target.closest('.comment-like-btn');
             if (commentLikeBtn) {
                 // 부모 요소(.comment-item)에서 댓글 번호를 가져옵니다.
@@ -478,6 +478,121 @@
             if (target.classList.contains('btn-comment-submit') && target.innerText === '_SUBMIT_REPLY') {
                 const replyForm = target.closest('.reply-form');
                 // ID에서 번호를 추출 (예: replyForm38 -> 38)
+                const parentNo = replyForm.id.replace('replyForm', '');
+                const content = replyForm.querySelector('.comment-textarea').value;
+
+                if (!content.trim()) {
+                    alert("내용을 입력하세요.");
+                    return;
+                }
+
+                await sendComment({ postNo, content, parentCommentNo: parentNo });
+            }
+        });
+    });
+</script>-->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const postNo = [[${post.postNo}]];
+        const likeBtn = document.getElementById('likeBtn');
+        const likeCount = document.getElementById('likeCount');
+        const mainCommentForm = document.querySelector('.comment-form');
+
+        // 1. 게시글 좋아요 로직 (secureFetch 적용)
+        if (likeBtn) {
+            likeBtn.addEventListener('click', async () => {
+                try {
+                    const response = await secureFetch(`/api/board/like/${postNo}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (response.status === 403) {
+                        alert("[ACCESS_DENIED] 로그인이 필요한 시스템입니다.");
+                        return;
+                    }
+                    if (!response.ok) throw new Error('NETWORK_ERR');
+                    const data = await response.json();
+                    likeBtn.classList.toggle('active', data.isLiked);
+                    likeCount.innerText = data.likeCount;
+                } catch (error) {
+                    console.error("LIKE_SYNC_FAILURE:", error);
+                }
+            });
+        }
+
+        // 2. 메인 댓글 등록 로직 (기존 유지)
+        if (mainCommentForm) {
+            mainCommentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const content = mainCommentForm.querySelector('.comment-textarea').value;
+                if (!content.trim()) {
+                    alert("내용을 입력하세요.");
+                    return;
+                }
+                await sendComment({ postNo, content, parentCommentNo: null });
+            });
+        }
+
+        // 3. 댓글 저장 공통 함수 (secureFetch 적용)
+        async function sendComment(payload) {
+            try {
+                const response = await secureFetch('/api/comments/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("[ERROR] 전송 실패");
+                }
+            } catch (error) {
+                console.error("COMMENT_SYNC_FAILURE:", error);
+            }
+        }
+
+        // 4. 동적 버튼 이벤트 위임 (댓글 좋아요 로직 - secureFetch 적용)
+        document.addEventListener('click', async (e) => {
+            const target = e.target;
+
+            const commentLikeBtn = target.closest('.comment-like-btn');
+            if (commentLikeBtn) {
+                const commentNo = commentLikeBtn.getAttribute('data-id');
+
+                try {
+                    const response = await secureFetch(`/api/comments/like/${commentNo}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    if (response.status === 403) {
+                        alert("[ACCESS_DENIED] 로그인이 필요합니다.");
+                        return;
+                    }
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        commentLikeBtn.classList.toggle('active', data.isLiked);
+                        const countSpan = commentLikeBtn.querySelector('.c-like-count');
+                        if (countSpan) countSpan.innerText = data.likeCount;
+                    }
+                } catch (error) {
+                    console.error("COMMENT_LIKE_SYNC_FAILURE:", error);
+                }
+                return;
+            }
+
+            // 대댓글 폼 토글 및 제출 로직은 위에서 정의한 sendComment(secureFetch 포함)를 호출하므로 그대로 유지
+            if (target.classList.contains('comment-action-btn') && target.innerText === '_REPLY') {
+                const commentItem = target.closest('.comment-item');
+                const replyForm = commentItem.querySelector('.reply-form');
+                if (replyForm) {
+                    replyForm.style.display = (replyForm.style.display === 'none' || replyForm.style.display === '') ? 'block' : 'none';
+                }
+            }
+
+            if (target.classList.contains('btn-comment-submit') && target.innerText === '_SUBMIT_REPLY') {
+                const replyForm = target.closest('.reply-form');
                 const parentNo = replyForm.id.replace('replyForm', '');
                 const content = replyForm.querySelector('.comment-textarea').value;
 

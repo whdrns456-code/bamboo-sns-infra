@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>BAMBOO_NET | IDENTITY_REGISTRATION</title>
     <link rel="stylesheet" href="/css/theme.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -225,7 +227,7 @@
 <script src="/js/main.js"></script>
 
 <script>
-    const signupForm = document.getElementById('signupForm');
+/*    const signupForm = document.getElementById('signupForm');
 
     signupForm.addEventListener('submit', async (e) => {
         e.preventDefault(); // 중요: 브라우저 기본 제출 동작 방지
@@ -307,7 +309,91 @@
         } finally {
             btnElement.disabled = false;
         }
+    }*/
+
+const signupForm = document.getElementById('signupForm');
+
+signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const nickname = document.getElementById('nickname').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (password !== confirmPassword) {
+        showSystemMessage('[ERROR] ACCESS_KEYS_DO_NOT_MATCH', true);
+        return;
     }
+
+    const signupData = {
+        username: username,
+        password: password,
+        confirmPassword: confirmPassword,
+        nickname: nickname
+    };
+
+    try {
+        // [수정] fetch -> secureFetch 교체
+        // POST 요청이므로 헤더에 자동으로 CSRF 토큰이 포함됩니다.
+        const response = await secureFetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(signupData)
+        });
+
+        if (response.ok) {
+            showSystemMessage('[SUCCESS] IDENTITY_REGISTRATION_COMPLETE');
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        } else {
+            const errorData = await response.json();
+            showSystemMessage(`[ERROR] ${errorData.message || 'REGISTRATION_FAILED'}`, true);
+        }
+    } catch (error) {
+        console.error('Fetch Error:', error);
+        showSystemMessage('[CRITICAL_ERROR] NETWORK_PROTOCOL_FAILURE', true);
+    }
+});
+
+// 공통 통신 함수 (아이디/닉네임 중복 체크)
+async function checkAvailability(type, value, btnElement) {
+    if (!value) {
+        showSystemMessage(`[SYSTEM] PLEASE_ENTER_${type.toUpperCase()}_FIRST`);
+        return;
+    }
+
+    btnElement.innerText = 'CHECKING...';
+    btnElement.disabled = true;
+
+    try {
+        // [수정] fetch -> secureFetch 교체
+        // GET 요청이므로 토큰 검사는 건너뛰지만, 통일성을 위해 사용합니다.
+        const response = await secureFetch(`/${type}?${type}=${encodeURIComponent(value)}`);
+        const result = await response.json();
+
+        if (result.available) {
+            showSystemMessage(`[SUCCESS] ${type.toUpperCase()}_IS_AVAILABLE`);
+            btnElement.innerText = 'AVAILABLE';
+            btnElement.style.borderColor = 'var(--primary-green)';
+            btnElement.style.color = 'var(--primary-green)';
+        } else {
+            showSystemMessage(`[ERROR] ${type.toUpperCase()}_ALREADY_IN_USE`);
+            btnElement.innerText = 'UNAVAILABLE';
+            btnElement.style.borderColor = 'var(--error-red)';
+            btnElement.style.color = 'var(--error-red)';
+        }
+    } catch (error) {
+        console.error(`${type} Check Error:`, error);
+        showSystemMessage('[CRITICAL_ERROR] VALIDATION_PROTOCOL_FAILED', true);
+    } finally {
+        btnElement.disabled = false;
+    }
+}
+
 
     // 아이디 체크 버튼 이벤트
     document.getElementById('checkIdBtn').addEventListener('click', function() {

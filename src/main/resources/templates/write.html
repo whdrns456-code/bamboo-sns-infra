@@ -219,7 +219,7 @@
 </div>
 
 <script src="/js/main.js"></script>
-<script>
+<!--<script>
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const previewBox = document.getElementById('previewBox');
@@ -280,6 +280,78 @@
 
 
 
+</script>-->
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewBox = document.getElementById('previewBox');
+    const removeImage = document.getElementById('removeImage');
+
+    // 이미지 미리보기 로직 (기존 유지)
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                previewBox.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    removeImage.addEventListener('click', function() {
+        imageInput.value = '';
+        imagePreview.src = '';
+        previewBox.style.display = 'none';
+    });
+
+    // 게시글 저장 로직 (secureFetch 적용)
+    document.querySelector('.write-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        try {
+            // [수정] fetch -> secureFetch 사용
+            // FormData를 보낼 때는 'Content-Type' 헤더를 직접 설정하지 마세요.
+            // 브라우저가 자동으로 'multipart/form-data; boundary=...'를 설정해줍니다.
+            const response = await secureFetch('/board/save', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                window.location.href = '/main';
+            } else {
+                const errorMsg = await response.text();
+                // showSystemModal 함수명이 위에서 정의한 것과 맞는지 확인 (showSystemMessage일 수도 있음)
+                showSystemModal('[SYSTEM_ERROR]', 'INJECTION_FAILED: ' + errorMsg);
+            }
+        } catch (error) {
+            console.error('SAVE_ERR:', error);
+            showSystemModal('[CRITICAL_FAILURE]', 'CONNECTION_LOST: CHECK_NETWORK_STATUS');
+        }
+    });
+
+    // 시스템 모달 로직 (기존 유지)
+    function showSystemModal(title, message, callback) {
+        const modal = document.getElementById('systemModal');
+        const tElement = document.getElementById('modalTitle');
+        const mElement = document.getElementById('modalMessage');
+
+        if (modal && tElement && mElement) {
+            tElement.innerText = title;
+            mElement.innerText = message;
+            modal.style.display = 'flex';
+        }
+
+        window.closeModal = function() {
+            modal.style.display = 'none';
+            if (callback) callback();
+        };
+    }
 </script>
+
 </body>
 </html>

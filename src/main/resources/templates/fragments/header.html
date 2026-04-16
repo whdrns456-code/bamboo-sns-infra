@@ -2,9 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <header th:fragment="header" class="terminal-nav">
+
     <div class="nav-container">
         <div class="logo">
             <a href="/main" class="glitch-text" data-text="BAMBOO_NET">BAMBOO_NET</a>

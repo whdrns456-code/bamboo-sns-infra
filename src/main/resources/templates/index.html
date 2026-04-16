@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>BAMBOO_NET | SESSION_INITIALIZATION</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -54,11 +56,12 @@
         }
 
         const loginForm = document.querySelector('#loginForm');
-
         const params = new URLSearchParams(new FormData(loginForm));
 
         try {
-            const response = await fetch('/login', {
+            // [수정] fetch -> secureFetch 사용
+            // secureFetch가 내부적으로 method가 'POST'인 것을 감지하고 토큰을 헤더에 실어줍니다.
+            const response = await secureFetch('/login', {
                 method: 'POST',
                 body: params,
                 headers: {
@@ -67,7 +70,7 @@
             });
 
             if (response.ok) {
-
+                // 로그인 성공 시 서버가 보낸 리다이렉트 경로(/main)로 이동
                 window.location.href = await response.text();
             } else {
                 showSystemMessage('ACCESS_DENIED: INVALID_CREDENTIALS', true);
