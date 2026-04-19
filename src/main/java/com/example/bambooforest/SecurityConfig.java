@@ -48,7 +48,8 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 )
-                .csrf(csrf -> csrf.disable());
+                // 기존의 .csrf(csrf -> csrf.disable())를 아래로 교체
+                .csrf(org.springframework.security.config.Customizer.withDefaults());
 
         return http.build();
     }
